@@ -16,7 +16,7 @@ namespace SPDVbmetaSigner
         public static TextBox LOGGBOX;
         public static string newline = Environment.NewLine;
         public static string readedfileHex;
-        public static bool debug = true;
+        public static bool debug = false;
         public static Process CurProcess;
         public static string command = "Tools\\pythonIT";
         public static string AvbCmd = "Tools\\avbtool.py ";
@@ -174,6 +174,8 @@ namespace SPDVbmetaSigner
             p.Start();
             p.WaitForExit();
             string output = p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
+            if (debug)
+                LOG(1, output);
             p.Close();
             p.Dispose();
             return output;

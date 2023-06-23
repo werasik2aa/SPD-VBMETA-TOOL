@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TextLogBox = new System.Windows.Forms.TextBox();
             this.PartsI = new System.Windows.Forms.DataGridView();
             this.ClrBTN = new System.Windows.Forms.Button();
@@ -42,10 +42,12 @@
             this.UlB = new System.Windows.Forms.GroupBox();
             this.UlockDevBTN = new System.Windows.Forms.Button();
             this.GenULSignBTN = new System.Windows.Forms.Button();
-            this.nProgressBar1 = new HuaweiUnlocker.UI.NProgressBar();
             this.Sign = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.PartNam = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.sizelen = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.LockDevBTN = new System.Windows.Forms.Button();
+            this.nProgressBar1 = new HuaweiUnlocker.UI.NProgressBar();
+            this.DBG = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.PartsI)).BeginInit();
             this.GPboxOPT.SuspendLayout();
             this.GpBox.SuspendLayout();
@@ -60,7 +62,7 @@
             this.TextLogBox.Multiline = true;
             this.TextLogBox.Name = "TextLogBox";
             this.TextLogBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextLogBox.Size = new System.Drawing.Size(324, 353);
+            this.TextLogBox.Size = new System.Drawing.Size(335, 353);
             this.TextLogBox.TabIndex = 0;
             // 
             // PartsI
@@ -78,12 +80,12 @@
             this.sizelen});
             this.PartsI.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystroke;
             this.PartsI.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(55)))), ((int)(((byte)(67)))), ((int)(((byte)(90)))));
-            this.PartsI.Location = new System.Drawing.Point(336, 19);
+            this.PartsI.Location = new System.Drawing.Point(347, 19);
             this.PartsI.MultiSelect = false;
             this.PartsI.Name = "PartsI";
             this.PartsI.RowHeadersVisible = false;
             this.PartsI.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.PartsI.Size = new System.Drawing.Size(437, 353);
+            this.PartsI.Size = new System.Drawing.Size(426, 353);
             this.PartsI.TabIndex = 35;
             // 
             // ClrBTN
@@ -106,7 +108,7 @@
             this.SignNowBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(38)))), ((int)(((byte)(41)))));
             this.SignNowBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SignNowBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.SignNowBtn.ForeColor = System.Drawing.Color.MediumSpringGreen;
+            this.SignNowBtn.ForeColor = System.Drawing.SystemColors.ActiveCaption;
             this.SignNowBtn.Location = new System.Drawing.Point(351, 462);
             this.SignNowBtn.Margin = new System.Windows.Forms.Padding(2);
             this.SignNowBtn.Name = "SignNowBtn";
@@ -118,6 +120,7 @@
             // 
             // GPboxOPT
             // 
+            this.GPboxOPT.Controls.Add(this.DBG);
             this.GPboxOPT.Controls.Add(this.RSALEN);
             this.GPboxOPT.Controls.Add(this.AndrverBOX);
             this.GPboxOPT.ForeColor = System.Drawing.SystemColors.ActiveCaption;
@@ -183,11 +186,11 @@
             this.UlockDevBTN.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(38)))), ((int)(((byte)(41)))));
             this.UlockDevBTN.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UlockDevBTN.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.UlockDevBTN.ForeColor = System.Drawing.Color.MediumSpringGreen;
+            this.UlockDevBTN.ForeColor = System.Drawing.SystemColors.ActiveCaption;
             this.UlockDevBTN.Location = new System.Drawing.Point(351, 496);
             this.UlockDevBTN.Margin = new System.Windows.Forms.Padding(2);
             this.UlockDevBTN.Name = "UlockDevBTN";
-            this.UlockDevBTN.Size = new System.Drawing.Size(433, 28);
+            this.UlockDevBTN.Size = new System.Drawing.Size(213, 28);
             this.UlockDevBTN.TabIndex = 41;
             this.UlockDevBTN.Text = "Unlock Device [FASTBOOT]";
             this.UlockDevBTN.UseVisualStyleBackColor = false;
@@ -208,6 +211,41 @@
             this.GenULSignBTN.UseVisualStyleBackColor = false;
             this.GenULSignBTN.Click += new System.EventHandler(this.GenULSignBTN_Click);
             // 
+            // Sign
+            // 
+            this.Sign.HeaderText = "Custom";
+            this.Sign.Name = "Sign";
+            // 
+            // PartNam
+            // 
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
+            this.PartNam.DefaultCellStyle = dataGridViewCellStyle3;
+            this.PartNam.HeaderText = "Partition";
+            this.PartNam.Name = "PartNam";
+            this.PartNam.ReadOnly = true;
+            // 
+            // sizelen
+            // 
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
+            this.sizelen.DefaultCellStyle = dataGridViewCellStyle4;
+            this.sizelen.HeaderText = "Length";
+            this.sizelen.Name = "sizelen";
+            // 
+            // LockDevBTN
+            // 
+            this.LockDevBTN.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(38)))), ((int)(((byte)(41)))));
+            this.LockDevBTN.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LockDevBTN.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.LockDevBTN.ForeColor = System.Drawing.Color.Crimson;
+            this.LockDevBTN.Location = new System.Drawing.Point(568, 496);
+            this.LockDevBTN.Margin = new System.Windows.Forms.Padding(2);
+            this.LockDevBTN.Name = "LockDevBTN";
+            this.LockDevBTN.Size = new System.Drawing.Size(216, 28);
+            this.LockDevBTN.TabIndex = 45;
+            this.LockDevBTN.Text = "Lock Device [FASTBOOT]";
+            this.LockDevBTN.UseVisualStyleBackColor = false;
+            this.LockDevBTN.Click += new System.EventHandler(this.LockDevBTN_Click);
+            // 
             // nProgressBar1
             // 
             this.nProgressBar1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(240)))), ((int)(((byte)(241)))));
@@ -224,25 +262,16 @@
             this.nProgressBar1.ValueMaximum = 100;
             this.nProgressBar1.ValueMinimum = 0;
             // 
-            // Sign
+            // DBG
             // 
-            this.Sign.HeaderText = "Custom";
-            this.Sign.Name = "Sign";
-            // 
-            // PartNam
-            // 
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black;
-            this.PartNam.DefaultCellStyle = dataGridViewCellStyle1;
-            this.PartNam.HeaderText = "Partition";
-            this.PartNam.Name = "PartNam";
-            this.PartNam.ReadOnly = true;
-            // 
-            // sizelen
-            // 
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            this.sizelen.DefaultCellStyle = dataGridViewCellStyle2;
-            this.sizelen.HeaderText = "Length";
-            this.sizelen.Name = "sizelen";
+            this.DBG.AutoSize = true;
+            this.DBG.Location = new System.Drawing.Point(324, 18);
+            this.DBG.Name = "DBG";
+            this.DBG.Size = new System.Drawing.Size(58, 17);
+            this.DBG.TabIndex = 2;
+            this.DBG.Text = "Debug";
+            this.DBG.UseVisualStyleBackColor = true;
+            this.DBG.CheckedChanged += new System.EventHandler(this.DBG_CheckedChanged);
             // 
             // Window
             // 
@@ -251,6 +280,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(38)))), ((int)(((byte)(49)))));
             this.ClientSize = new System.Drawing.Size(788, 528);
+            this.Controls.Add(this.LockDevBTN);
             this.Controls.Add(this.GenULSignBTN);
             this.Controls.Add(this.nProgressBar1);
             this.Controls.Add(this.UlockDevBTN);
@@ -266,6 +296,7 @@
             this.Text = "SPD Sign TOOL";
             ((System.ComponentModel.ISupportInitialize)(this.PartsI)).EndInit();
             this.GPboxOPT.ResumeLayout(false);
+            this.GPboxOPT.PerformLayout();
             this.GpBox.ResumeLayout(false);
             this.GpBox.PerformLayout();
             this.UlB.ResumeLayout(false);
@@ -292,6 +323,8 @@
         private System.Windows.Forms.DataGridViewCheckBoxColumn Sign;
         private System.Windows.Forms.DataGridViewTextBoxColumn PartNam;
         private System.Windows.Forms.DataGridViewTextBoxColumn sizelen;
+        private System.Windows.Forms.Button LockDevBTN;
+        private System.Windows.Forms.CheckBox DBG;
     }
 }
 

@@ -151,6 +151,7 @@ namespace SPDVbmetaSigner
             var result = SyncRUN(FASTBOOTCmd, "devices").ToLower();
             if (result.ToLower().Contains("fastboot"))
             {
+                LOG(0, "[Device] " + result);
                 LOG(0, "[Test Unlock CMDS] flashing unlock");
                 result = SyncRUN(FASTBOOTCmd, "flashing unlock");
                 if (isErr(result)) LOG(0, "[TEST UNLOCK] Warning SecureBoot! Trying Another Method!");
@@ -175,17 +176,18 @@ namespace SPDVbmetaSigner
 
                 LOG(0, "[Generation UlKey.bin] Started");
                 GenSignatureBin(lines[1], 4096, "Out\\UlKey.bin");
+                LOG(0, "[Unlocking] Out\\UlKey.bin");
                 result = SyncRUN(FASTBOOTCmd, "flashing unlock_bootloader Out\\Ulkey.bin");
                 if (!result.Contains("fail"))
-                    LOG(0, "[SN UNLOCK] FAILED WRONG SN OR KEY");
+                    LOG(0, "[Bootloader] FAILED WRONG SN OR KEY OR ALREADY UNLOCKED" + result);
                 else
-                    LOG(0, "[SN UNLOCK] SUCESSFULL Ul");
+                    LOG(0, "[Bootloader] Unlock bootloader success");
             }
         }
         private bool isErr(string i)
         {
             i = i.ToLower();
-            return i.Contains("fail") || i.Contains("not implement") || i.Contains("not ") || i.Contains("error");
+            return (i.Contains("fail") || i.Contains("not implement") || i.Contains("not ") || i.Contains("error")) && (!i.Contains("success") || !i.Contains("unlocked") || !i.Contains("locked"));
         }
 
         private void GenULSignBTN_Click(object sender, EventArgs e)
@@ -194,6 +196,26 @@ namespace SPDVbmetaSigner
                 GenSignatureBin(SNboxTXT.Text, 4096, "Out\\UlKey.bin");
             else
                 LOG(2, "Must be *SN_ID <= 80* and only numbers");
+        }
+
+        private void LockDevBTN_Click(object sender, EventArgs e)
+        {
+            var result = SyncRUN(FASTBOOTCmd, "devices").ToLower();
+            if (result.ToLower().Contains("fastboot"))
+            {
+                LOG(0, "[Device] " + result);
+                LOG(0, "[Locking Bootloader]");
+                SyncRUN(FASTBOOTCmd, "flashing lock_bootloader").ToLower();
+                if (isErr(result)) 
+                    LOG(0, "[TEST UNLOCK] Warning SecureBoot! Failed to lock bootloader or it's already locked!");
+                else
+                    LOG(0, "[Bootloader] Lock bootloader success");
+            }
+        }
+
+        private void DBG_CheckedChanged(object sender, EventArgs e)
+        {
+            debug = DBG.Checked;
         }
     }
 }
