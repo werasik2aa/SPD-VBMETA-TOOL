@@ -1,0 +1,242 @@
+﻿using HuaweiUnlocker.UI;
+using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace SPDVbmetaSigner
+{
+    public class CORE
+    {
+        public static TextBox LOGGBOX;
+        public static string newline = Environment.NewLine;
+        public static string readedfileHex;
+        public static bool debug = true;
+        public static Process CurProcess;
+        public static string command = "Tools\\pythonIT";
+        public static string AvbCmd = "Tools\\avbtool.py ";
+        public static string vbmetacreate;
+
+        public static byte[] HexFileRead(string path, UInt32 Offset, int count)
+        {
+            BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open));
+            reader.BaseStream.Position = Offset;
+            byte[] a = reader.ReadBytes(count);
+            reader.Close();
+            reader.Dispose();
+            return a;
+        }
+
+        public static string ReadFileInHex(string path = "In\\1.img")
+        {
+            return BitConverter.ToString(ReadFileInBytes(path)).Replace("-", "");
+        }
+        public static byte[] ReadFileInBytes(string path = "In\\1.img")
+        {
+            return File.ReadAllBytes(path);
+        }
+        public static byte[] HexStringToBytes(string strInput)
+        {
+            try
+            {
+                int startIndex = 0;
+                byte[] buffer = new byte[strInput.Length];
+                for (int i = 0; strInput.Length > (startIndex + 1); i++)
+                {
+                    buffer[i] = Convert.ToByte(Convert.ToInt64(strInput.Substring(startIndex, 2), 0x10));
+                    startIndex += 2;
+                }
+                return buffer;
+            }
+            catch (Exception)
+            {
+                LOG(2, "Hex String To Byte Array Conversion Error!");
+            }
+            return null;
+        }
+        public static string BytesToHexString(byte[] byteInput)
+        {
+            try
+            {
+                string str3 = "";
+                foreach (byte num in byteInput) str3 = str3 + Conversion.Hex(num).PadLeft(2, '0');
+                return str3;
+            }
+            catch (Exception e)
+            { LOG(2, e.Message); }
+            return "";
+        }
+        public static void LOG(int i, string o, object a = null, string sepa = " ")
+        {
+            string d;
+            switch (i)
+            {
+                default:
+                    d = "";
+                    break;
+                case 0:
+                    d = "[INFO] ";
+                    break;
+                case 1:
+                    d = "[WARNING] ";
+                    break;
+                case 2:
+                    d = "[ERROR] ";
+                    break;
+            }
+            o = Language.Get(o) != null ? Language.Get(o) : o;
+            if (a != null)
+                a = Language.Get(a.ToString()) != null ? Language.Get(a.ToString()) : a;
+            LOGGBOX.AppendText(newline + d + o + sepa + a);
+        }
+        public static string HexDump(byte[] bytes, int bytesPerLine = 16)
+        {
+            if (bytes == null) return "<null>";
+            int bytesLength = bytes.Length;
+
+            char[] HexChars = "0123456789ABCDEF".ToCharArray();
+
+            int firstHexColumn =
+                  8                   // 8 characters for the address
+                + 3;                  // 3 spaces
+
+            int firstCharColumn = firstHexColumn
+                + bytesPerLine * 3       // - 2 digit for the hexadecimal value and 1 space
+                + (bytesPerLine - 1) / 8 // - 1 extra space every 8 characters from the 9th
+                + 2;                  // 2 spaces 
+
+            int lineLength = firstCharColumn
+                + bytesPerLine           // - characters to show the ascii value
+                + Environment.NewLine.Length; // Carriage return and line feed (should normally be 2)
+
+            char[] line = (new String(' ', lineLength - Environment.NewLine.Length) + Environment.NewLine).ToCharArray();
+            int expectedLines = (bytesLength + bytesPerLine - 1) / bytesPerLine;
+            StringBuilder result = new StringBuilder(expectedLines * lineLength);
+
+            for (int i = 0; i < bytesLength; i += bytesPerLine)
+            {
+                line[0] = HexChars[(i >> 28) & 0xF];
+                line[1] = HexChars[(i >> 24) & 0xF];
+                line[2] = HexChars[(i >> 20) & 0xF];
+                line[3] = HexChars[(i >> 16) & 0xF];
+                line[4] = HexChars[(i >> 12) & 0xF];
+                line[5] = HexChars[(i >> 8) & 0xF];
+                line[6] = HexChars[(i >> 4) & 0xF];
+                line[7] = HexChars[(i >> 0) & 0xF];
+
+                int hexColumn = firstHexColumn;
+                int charColumn = firstCharColumn;
+
+                for (int j = 0; j < bytesPerLine; j++)
+                {
+                    if (j > 0 && (j & 7) == 0) hexColumn++;
+                    if (i + j >= bytesLength)
+                    {
+                        line[hexColumn] = ' ';
+                        line[hexColumn + 1] = ' ';
+                        line[charColumn] = ' ';
+                    }
+                    else
+                    {
+                        byte b = bytes[i + j];
+                        line[hexColumn] = HexChars[(b >> 4) & 0xF];
+                        line[hexColumn + 1] = HexChars[b & 0xF];
+                        line[charColumn] = (b < 32 ? '·' : (char)b);
+                    }
+                    hexColumn += 3;
+                    charColumn++;
+                }
+                result.Append(line);
+            }
+            return result.ToString();
+        }
+        public static bool SyncRUN(string command, string subcommand)
+        {
+            Process p = CurProcess = new Process();
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = command;
+            p.StartInfo.Arguments = subcommand;
+            p.Start();
+            string outtext;
+            while ((outtext = p.StandardOutput.ReadLine()) != null)
+                LOG(0, outtext);
+            p.WaitForExit();
+            p.Close();
+            p.Dispose();
+            return true;
+        }
+        public static void AddHashFooter(string img, int RsaLength = 4096)
+        {
+            string subcommand = AvbCmd + "add_hash_footer --image Work\\" + img + ".img --partition_size 36700160 --partition_name " + img + " --hash_algorithm sha256 --algorithm SHA256_RSA" + RsaLength + " --key Tools\\rsa" + RsaLength + "_vbmeta.pem";
+            SyncRUN(command, subcommand);
+        }
+        public static void SignImage(string img, int partition_size = 36700160)
+        {
+            string subcommand = AvbCmd + "append_vbmeta_image --image Work\\" + img + ".img --partition_size " + partition_size + " --vbmeta_image vbmeta_" + img + ".img";
+            SyncRUN(command, subcommand);
+        }
+        public static Dictionary<string, string[]> ReadAllPartitions()
+        {
+            Dictionary<string, string[]> a = new Dictionary<string, string[]>();
+            int end = 0;
+            int index = 0;
+            string pattern = "00001000";
+            while (readedfileHex.Length > end + pattern.Length)
+            {
+                if (!readedfileHex.Substring(index, pattern.Length).StartsWith(pattern))
+                    end = index++;
+                else if (!readedfileHex.Substring(end, 8).StartsWith("00000000"))
+                    end++;
+                else
+                {
+                    if (index - pattern.Length - 16 > 0)
+                    {
+                        string rawhex = readedfileHex.Substring(index - pattern.Length - 16, 32).Trim('0');
+                        string text = Encoding.ASCII.GetString(HexStringToBytes(rawhex));
+                        string[] o = new string[2];
+                        text = Regex.Replace(text, "(?i)[^А-ЯЁA-Z_]", string.Empty);
+                        if (text.Length >= 3 && !string.IsNullOrWhiteSpace(text) && !string.IsNullOrEmpty(text))
+                        {
+                            o[0] = "";
+                            o[1] = "False";
+                            a.Add(text, o);
+                            LOG(0, "[HEX]: " + rawhex + " [" + text.Trim() + "]");
+                        }
+                    }
+                    index++;
+                }
+            }
+            return a;
+        }
+        public static void KeyGenMeta(int rsalen = 4096)
+        {
+            string subcommand = AvbCmd + "extract_public_key --key Tools\\rsa" + rsalen + "_vbmeta.pem --output Work\\vbmeta.avbpubkey";
+            SyncRUN(command, subcommand);
+        }
+        public static void VbmetaCreate(int size = 4096, int rsalen = 4096)
+        {
+            SyncRUN(command, AvbCmd + "make_vbmeta_image --output Work\\vbmeta_unchecksummed.img --key Tools\\rsa" + rsalen + "_vbmeta.pem --algorithm SHA256_RSA" + rsalen + " --padding_size " + size + " --rollback_index 0 --flags 2" + vbmetacreate);
+            FileStream fileStream = File.Open("Work\\vbmeta_unchecksummed.img", FileMode.Open);
+            fileStream.SetLength(12288);
+            fileStream.Close();
+            fileStream.Dispose();
+        }
+        public static void Android_PAD(int av = 8)
+        {
+            av = av == 11? 10 : av;
+            SyncRUN(command, "Tools\\vbmeta_pad" + av + ".py");
+        }
+        public static void GenerateEmptyMeta(string img, int RsaLength = 4096)
+        {
+            string subcommand = AvbCmd + "make_vbmeta_image --output Work\\vbmeta_" + img + ".img --key Tools\\rsa" + RsaLength + "_vbmeta.pem --algorithm SHA256_RSA" + RsaLength + " --padding_size " + RsaLength + " --rollback_index 1";
+            SyncRUN(command, subcommand);
+        }
+    }
+}
