@@ -1,5 +1,6 @@
 ﻿using HuaweiUnlocker.UI;
 using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SPDVbmetaSigner
 {
-    public class CORE
+    public static class CORE
     {
         public static TextBox LOGGBOX;
         public static string newline = Environment.NewLine;
@@ -19,8 +20,10 @@ namespace SPDVbmetaSigner
         public static Process CurProcess;
         public static string command = "Tools\\pythonIT";
         public static string AvbCmd = "Tools\\avbtool.py ";
+        public static string SSLCmd = "Tools\\bin\\openssl ";
+        public static string FASTBOOTCmd = "Tools\\fastboot ";
         public static string vbmetacreate;
-
+        public static NProgressBar PGG;
         public static byte[] HexFileRead(string path, UInt32 Offset, int count)
         {
             BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open));
@@ -154,23 +157,26 @@ namespace SPDVbmetaSigner
             }
             return result.ToString();
         }
-        public static bool SyncRUN(string command, string subcommand)
+        public static void Progress(int perc)
+        {
+            PGG.Value = perc;
+        }
+        public static string SyncRUN(string command, string subcommand)
         {
             Process p = CurProcess = new Process();
             p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             p.StartInfo.CreateNoWindow = true;
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
             p.StartInfo.FileName = command;
             p.StartInfo.Arguments = subcommand;
             p.Start();
-            string outtext;
-            while ((outtext = p.StandardOutput.ReadLine()) != null)
-                LOG(0, outtext);
             p.WaitForExit();
+            string output = p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
             p.Close();
             p.Dispose();
-            return true;
+            return output;
         }
         public static void AddHashFooter(string img, int RsaLength = 4096)
         {
@@ -182,9 +188,9 @@ namespace SPDVbmetaSigner
             string subcommand = AvbCmd + "append_vbmeta_image --image Work\\" + img + ".img --partition_size " + partition_size + " --vbmeta_image vbmeta_" + img + ".img";
             SyncRUN(command, subcommand);
         }
-        public static Dictionary<string, string[]> ReadAllPartitions()
+        public static List<string> ReadAllPartitions()
         {
-            Dictionary<string, string[]> a = new Dictionary<string, string[]>();
+            List<string> a = new List<string>();
             int end = 0;
             int index = 0;
             string pattern = "00001000";
@@ -200,13 +206,10 @@ namespace SPDVbmetaSigner
                     {
                         string rawhex = readedfileHex.Substring(index - pattern.Length - 16, 32).Trim('0');
                         string text = Encoding.ASCII.GetString(HexStringToBytes(rawhex));
-                        string[] o = new string[2];
                         text = Regex.Replace(text, "(?i)[^А-ЯЁA-Z_]", string.Empty);
-                        if (text.Length >= 3 && !string.IsNullOrWhiteSpace(text) && !string.IsNullOrEmpty(text))
+                        if (text.Length >= 3 && !string.IsNullOrWhiteSpace(text) && !string.IsNullOrEmpty(text) && !text.Contains("AVB"))
                         {
-                            o[0] = "";
-                            o[1] = "False";
-                            a.Add(text, o);
+                            a.Add(text);
                             LOG(0, "[HEX]: " + rawhex + " [" + text.Trim() + "]");
                         }
                     }
@@ -237,6 +240,33 @@ namespace SPDVbmetaSigner
         {
             string subcommand = AvbCmd + "make_vbmeta_image --output Work\\vbmeta_" + img + ".img --key Tools\\rsa" + RsaLength + "_vbmeta.pem --algorithm SHA256_RSA" + RsaLength + " --padding_size " + RsaLength + " --rollback_index 1";
             SyncRUN(command, subcommand);
+        }
+        public static IEnumerable<String> SplitInParts(this String s, Int32 partLength)
+        {
+            if (s == null)
+                throw new ArgumentNullException(nameof(s));
+            if (partLength <= 0)
+                throw new ArgumentException("Part length has to be positive.", nameof(partLength));
+
+            for (var i = 0; i < s.Length; i += partLength)
+                yield return s.Substring(i, Math.Min(partLength, s.Length - i));
+        }
+        public static void GenSignatureBin(string id, int RsaLength, string OutPath)
+        {
+            var bytes = new byte[id.Length / 2];
+            for (var i = 0; i < bytes.Length; i++)
+                bytes[i] = Convert.ToByte(id.Substring(i * 2, 2), 16);
+            id = Encoding.ASCII.GetString(bytes);
+            LOG(0, "[DecryptHex]: " + id);
+            LOG(0, "[Writing]: Work\\SNHEX.avbpubkey");
+            File.WriteAllText("Work\\SNHEX.avbpubkey", id);
+            var o = File.Open("Work\\SNHEX.avbpubkey", FileMode.Open);
+            o.SetLength(80-id.Length);
+            o.Close();
+            o.Dispose();
+            LOG(0, "[Writed]: Work\\SNHEX.avbpubkey");
+            LOG(0, "[RSA Generate] UnlockSig: " + OutPath);
+            SyncRUN(SSLCmd, "dgst -sha256 -out "+ OutPath + " -sign Tools\\rsa" + RsaLength + "_vbmeta.pem Work\\SNHEX.avbpubkey");
         }
     }
 }
