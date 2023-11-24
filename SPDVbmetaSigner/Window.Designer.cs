@@ -32,9 +32,13 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TextLogBox = new System.Windows.Forms.TextBox();
             this.PartsI = new System.Windows.Forms.DataGridView();
+            this.Sign = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.PartNam = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.sizelen = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ClrBTN = new System.Windows.Forms.Button();
             this.SignNowBtn = new System.Windows.Forms.Button();
             this.GPboxOPT = new System.Windows.Forms.GroupBox();
+            this.DBG = new System.Windows.Forms.CheckBox();
             this.RSALEN = new System.Windows.Forms.ComboBox();
             this.AndrverBOX = new System.Windows.Forms.ComboBox();
             this.SNboxTXT = new System.Windows.Forms.TextBox();
@@ -42,12 +46,8 @@
             this.UlB = new System.Windows.Forms.GroupBox();
             this.UlockDevBTN = new System.Windows.Forms.Button();
             this.GenULSignBTN = new System.Windows.Forms.Button();
-            this.Sign = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.PartNam = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sizelen = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LockDevBTN = new System.Windows.Forms.Button();
             this.nProgressBar1 = new HuaweiUnlocker.UI.NProgressBar();
-            this.DBG = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.PartsI)).BeginInit();
             this.GPboxOPT.SuspendLayout();
             this.GpBox.SuspendLayout();
@@ -87,6 +87,26 @@
             this.PartsI.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.PartsI.Size = new System.Drawing.Size(426, 353);
             this.PartsI.TabIndex = 35;
+            // 
+            // Sign
+            // 
+            this.Sign.HeaderText = "Custom";
+            this.Sign.Name = "Sign";
+            // 
+            // PartNam
+            // 
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
+            this.PartNam.DefaultCellStyle = dataGridViewCellStyle3;
+            this.PartNam.HeaderText = "Partition";
+            this.PartNam.Name = "PartNam";
+            this.PartNam.ReadOnly = true;
+            // 
+            // sizelen
+            // 
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
+            this.sizelen.DefaultCellStyle = dataGridViewCellStyle4;
+            this.sizelen.HeaderText = "Length";
+            this.sizelen.Name = "sizelen";
             // 
             // ClrBTN
             // 
@@ -131,23 +151,34 @@
             this.GPboxOPT.TabStop = false;
             this.GPboxOPT.Text = "Options";
             // 
+            // DBG
+            // 
+            this.DBG.AutoSize = true;
+            this.DBG.Location = new System.Drawing.Point(324, 18);
+            this.DBG.Name = "DBG";
+            this.DBG.Size = new System.Drawing.Size(58, 17);
+            this.DBG.TabIndex = 2;
+            this.DBG.Text = "Debug";
+            this.DBG.UseVisualStyleBackColor = true;
+            this.DBG.CheckedChanged += new System.EventHandler(this.DBG_CheckedChanged);
+            // 
             // RSALEN
             // 
+            this.RSALEN.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RSALEN.FormattingEnabled = true;
             this.RSALEN.Location = new System.Drawing.Point(178, 16);
             this.RSALEN.Name = "RSALEN";
             this.RSALEN.Size = new System.Drawing.Size(140, 21);
             this.RSALEN.TabIndex = 1;
-            this.RSALEN.Text = "RSA_4096";
             // 
             // AndrverBOX
             // 
+            this.AndrverBOX.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.AndrverBOX.FormattingEnabled = true;
             this.AndrverBOX.Location = new System.Drawing.Point(6, 16);
             this.AndrverBOX.Name = "AndrverBOX";
             this.AndrverBOX.Size = new System.Drawing.Size(166, 21);
             this.AndrverBOX.TabIndex = 0;
-            this.AndrverBOX.Text = "Android_8";
             // 
             // SNboxTXT
             // 
@@ -211,26 +242,6 @@
             this.GenULSignBTN.UseVisualStyleBackColor = false;
             this.GenULSignBTN.Click += new System.EventHandler(this.GenULSignBTN_Click);
             // 
-            // Sign
-            // 
-            this.Sign.HeaderText = "Custom";
-            this.Sign.Name = "Sign";
-            // 
-            // PartNam
-            // 
-            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black;
-            this.PartNam.DefaultCellStyle = dataGridViewCellStyle3;
-            this.PartNam.HeaderText = "Partition";
-            this.PartNam.Name = "PartNam";
-            this.PartNam.ReadOnly = true;
-            // 
-            // sizelen
-            // 
-            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black;
-            this.sizelen.DefaultCellStyle = dataGridViewCellStyle4;
-            this.sizelen.HeaderText = "Length";
-            this.sizelen.Name = "sizelen";
-            // 
             // LockDevBTN
             // 
             this.LockDevBTN.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(27)))), ((int)(((byte)(38)))), ((int)(((byte)(41)))));
@@ -261,17 +272,6 @@
             this.nProgressBar1.Value = 0;
             this.nProgressBar1.ValueMaximum = 100;
             this.nProgressBar1.ValueMinimum = 0;
-            // 
-            // DBG
-            // 
-            this.DBG.AutoSize = true;
-            this.DBG.Location = new System.Drawing.Point(324, 18);
-            this.DBG.Name = "DBG";
-            this.DBG.Size = new System.Drawing.Size(58, 17);
-            this.DBG.TabIndex = 2;
-            this.DBG.Text = "Debug";
-            this.DBG.UseVisualStyleBackColor = true;
-            this.DBG.CheckedChanged += new System.EventHandler(this.DBG_CheckedChanged);
             // 
             // Window
             // 

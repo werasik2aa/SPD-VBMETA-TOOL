@@ -28,6 +28,7 @@ namespace SPDVbmetaSigner
             LOG(1, "Default RSA: RSA_4096 for most devices! RSA_2048 use it, if RSA_4096 doesn't works!");
             LOG(0, "This use modified avbtool.py");
             PGG = nProgressBar1;
+            AndrverBOX.SelectedIndex = RSALEN.SelectedIndex = 0;
         }
 
         private void SignNowBtn_Click(object sender, EventArgs e)
@@ -118,7 +119,7 @@ namespace SPDVbmetaSigner
             }
             Progress(50);
             LOG(0, "Generating Vbmeta Image");
-            VbmetaCreate(rsaleng, rsaleng);
+            VbmetaCreate(andrver, rsaleng);
             Progress(80);
             LOG(0, "Padding Vbmeta Image");
             Android_PAD(andrver);

@@ -206,7 +206,7 @@ namespace SPDVbmetaSigner
                 {
                     if (index - pattern.Length - 16 > 0)
                     {
-                        string rawhex = readedfileHex.Substring(index - pattern.Length - 16, 32).Trim('0');
+                        string rawhex = readedfileHex.Substring(index - pattern.Length - 20, 34).Trim('0');
                         string text = Encoding.ASCII.GetString(HexStringToBytes(rawhex));
                         text = Regex.Replace(text, "(?i)[^А-ЯЁA-Z_]", string.Empty);
                         if (text.Length >= 3 && !string.IsNullOrWhiteSpace(text) && !string.IsNullOrEmpty(text) && !text.Contains("AVB"))
@@ -225,9 +225,26 @@ namespace SPDVbmetaSigner
             string subcommand = AvbCmd + "extract_public_key --key Tools\\rsa" + rsalen + "_vbmeta.pem --output Work\\vbmeta.avbpubkey";
             SyncRUN(command, subcommand);
         }
-        public static void VbmetaCreate(int size = 4096, int rsalen = 4096)
+        public static void VbmetaCreate(int av, int rsalen = 4096)
         {
-            SyncRUN(command, AvbCmd + "make_vbmeta_image --output Work\\vbmeta_unchecksummed.img --key Tools\\rsa" + rsalen + "_vbmeta.pem --algorithm SHA256_RSA" + rsalen + " --padding_size " + size + " --rollback_index 0 --flags 2" + vbmetacreate);
+            int padd = 12288;
+            switch (av)
+            {
+                case 8:
+                    padd = 12288;
+                    break;
+                case 9:
+                    padd = 16384;
+                    break;
+                case 10:
+                    padd = 20480;
+                    break;
+                case 11:
+                    padd = 20480;
+                    break;
+            }
+
+            SyncRUN(command, AvbCmd + "make_vbmeta_image --output Work\\vbmeta_unchecksummed.img --key Tools\\rsa" + rsalen + "_vbmeta.pem --algorithm SHA256_RSA" + rsalen + " --padding_size " + padd + " --rollback_index 0 --flags 2" + vbmetacreate);
             FileStream fileStream = File.Open("Work\\vbmeta_unchecksummed.img", FileMode.Open);
             fileStream.SetLength(12288);
             fileStream.Close();
